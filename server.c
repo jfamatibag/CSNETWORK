@@ -10,7 +10,7 @@
 #define SERVER_NUM 67 
 
 struct Packet {
-    char name[50];
+    char name[100];
     int number;
 };
 
