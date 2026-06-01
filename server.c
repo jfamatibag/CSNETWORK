@@ -4,13 +4,13 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib") // links to the Windows socket library
 
 #define PORT 8080
-#define SERVER_NUM 42 
+#define SERVER_NUM 67 
 
 struct Packet {
-    char name[100];
+    char name[50];
     int number;
 };
 
@@ -19,28 +19,28 @@ int main() {
     SOCKET server_fd = INVALID_SOCKET;
     SOCKET client_socket = INVALID_SOCKET;
     struct sockaddr_in address;
-    struct Packet receivedPacket;   // if error put back to while loop
-    struct Packet replyPacket;      // if error put back to while loop
+    struct Packet receivedPacket;   
+    struct Packet replyPacket;      
     int addrlen = sizeof(address);
     int server_running = 1;
     int bytesRead;
     int exit_status = 0;
-    char *serverName = "Server of Test Name";
+    char *serverName = "Server of John Q. Smith";
 
-    printf("[INIT] Starting Windows Server initialization...\n");
+    printf("[INITIALIZATION] ...\n");
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        printf("[ERROR] Winsock initialization failed.\n");
+        printf("[ERROR] WSAStartup failed.\n");
         exit_status = 1;
     }
-    printf("[SUCCESS] Winsock initialized successfully.\n");
+    printf("[SUCCESS] WSAStartup initialized successfully.\n");
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         printf("[ERROR] Socket creation failed.\n");
         WSACleanup();
         exit_status = 1;
     }
-    printf("[SUCCESS] Master socket created successfully.\n");
+    printf("[SUCCESS] Server socket created.\n");
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -77,7 +77,7 @@ int main() {
                 printf("[RECEIVED] Successfully read %d bytes from the client.\n", bytesRead);
 
                 if (receivedPacket.number < 1 || receivedPacket.number > 100) {
-                    printf("[TERMINATION] Detected out-of-range integer (%d).\n", receivedPacket.number);
+                    printf("[TERMINATION] Out-of-range integer (%d).\n", receivedPacket.number);
                     server_running = 0; 
                 } else {
                     printf("\n");
@@ -85,7 +85,7 @@ int main() {
                     printf("Server Name:             %s\n", serverName);
                     printf("Client's Number:         %d\n", receivedPacket.number);
                     printf("Server's Picked Number:  %d\n", SERVER_NUM);
-                    printf("Mathematical Sum:        %d\n", receivedPacket.number + SERVER_NUM);
+                    printf("Sum:        %d\n", receivedPacket.number + SERVER_NUM);
                     printf("\n");
 
                     strcpy(replyPacket.name, serverName);
@@ -96,7 +96,7 @@ int main() {
                     printf("[SUCCESS] Reply successfully sent to client.\n");
                 }
             } else {
-                printf("[WARNING] Failed to receive data or client disconnected.\n");
+                printf("[ERROR] Failed to receive data or client disconnected.\n");
             }
 
             closesocket(client_socket);
@@ -106,11 +106,11 @@ int main() {
         }
     }
 
-    printf("\n[CLEANUP] Releasing master server socket file descriptor...\n");
+    printf("\n[TERMINATION] Closing server socket...\n");
     closesocket(server_fd);
-    printf("[CLEANUP] WSACleanup() to de-allocate network libraries...\n");
+    printf("[TERMINATION] WSACleanup() to de-allocate network libraries...\n");
     WSACleanup();
-    printf("[STATUS] Server shutdown complete. Exiting cleanly.\n");
+    printf("[TERMINATION] Server shutdown complete. Exiting...\n");
 
     return exit_status;
 }
