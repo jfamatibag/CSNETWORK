@@ -4,12 +4,12 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib") // links to the Windows socket library
 
 #define PORT 8080
 
 struct Packet {
-    char name[100];
+    char name[50];
     int number;
 };
 
@@ -25,19 +25,19 @@ int main() {
     int finalSum;
     int exit_status = 0;
 
-    printf("Enter an integer between 1 and 100 (or out-of-range to shutdown server): ");
+    printf("Enter an integer between 1 - 100 (or out-of-range to shutdown server): ");
     if (scanf("%d", &inputNumber) != 1) {
         printf("[ERROR] Failed to parse integer input.\n");
         exit_status = 1;
     }
     printf("[INPUT] User entered integer value: %d\n", inputNumber);
 
-    strcpy(clientPacket.name, "Client of Name Test");
+    strcpy(clientPacket.name, "Client of John Q. Smith");
     clientPacket.number = inputNumber;
 
-    printf("[INIT] Initializing Winsock library components...\n");
+    printf("[INITIALIZATION] ...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        printf("[ERROR] Winsock initialization failed.\n");
+        printf("[ERROR] WSAStartup failed.\n");
         exit_status = 1;
     }
     printf("[SUCCESS] Winsock library active.\n");
@@ -74,7 +74,7 @@ int main() {
 
     if (inputNumber < 1 || inputNumber > 100) {
         printf("[STATUS] Value out of range. Server has been notified to terminate.\n");
-        printf("[CLEANUP] Releasing client socket handles and exiting cleanly.\n");
+        printf("[TERMINATION] Closing client socket and exiting cleanly.\n");
         closesocket(sock);
         WSACleanup();
         exit_status = 0;
@@ -92,17 +92,17 @@ int main() {
         printf("Server Name (Extracted): %s\n", serverPacket.name);
         printf("Client's Integer Value:  %d\n", clientPacket.number);
         printf("Server's Integer Value:  %d\n", serverPacket.number);
-        printf("Calculated Local Sum:    %d\n", finalSum);
+        printf("Sum:    %d\n", finalSum);
         printf("\n");
     } else {
         printf("[ERROR] Did not get a clean response data frame from the server.\n");
     }
 
-    printf("[CLEANUP] Closing local client socket handles...\n");
+    printf("[TERMINATION] Closing client socket...\n");
     closesocket(sock);
-    printf("[CLEANUP] WSACleanup() to de-allocate network libraries...\n");
+    printf("[TERMINATION] WSACleanup() to de-allocate network libraries...\n");
     WSACleanup();
-    printf("[STATUS] Execution complete. Process terminating.\n");
+    printf("[TERMINATION] Execution complete. Process terminating.\n");
 
     return exit_status;
 }
