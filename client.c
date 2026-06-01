@@ -9,7 +9,7 @@
 #define PORT 8080
 
 struct Packet {
-    char name[50];
+    char name[100];
     int number;
 };
 
